@@ -20,7 +20,8 @@
  *
  *   enabled            true/false
  *   levelOffset        0 = match Sam's exact level and EXP.
- *                      N = catch up to the start of level (Sam's level - N).
+ *                      N = catch up to level (Sam's level - N) with the
+ *                          same % progress toward the next level as Sam.
  *   sourceActorId      Actor whose level is used as the reference (Sam = 1).
  *   excludedActorIds   Actors that are never synced.
  *   preserveHpMpRatio  Keep HP/MP percentage after leveling, so a
@@ -40,7 +41,7 @@
 
     const DEFAULTS = {
         enabled: true,
-        levelOffset: 0,
+        levelOffset: 1,
         sourceActorId: 1,
         // 27 Fungus, 29-37 the in-game RPG heroes, 40 Betty, 41 placeholder
         excludedActorIds: [27, 29, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41],
@@ -93,25 +94,32 @@
     // Target EXP calculation
     //-------------------------------------------------------------------------
 
+    // Fraction (0 to <1) of the way `actor` is from its current level to the next.
+    const levelProgress = actor => {
+        if (actor.isMaxLevel()) {
+            return 0;
+        }
+        const start = actor.currentLevelExp();
+        const span = actor.nextLevelExp() - start;
+        return span > 0 ? Math.min(Math.max((actor.currentExp() - start) / span, 0), 1) : 0;
+    };
+
     // Returns the minimum EXP `actor` should have, measured on the actor's
     // own EXP curve, or null if the actor should not be synced.
+    // Target = level (Sam's level - offset), with the same fractional progress
+    // toward the next level as Sam, so the target rises smoothly as Sam earns
+    // EXP instead of jumping a whole level each time Sam levels up.
     const targetExpFor = (actor, source) => {
-        const offset = config.levelOffset;
-        const targetLevel = Math.min(source.level - offset, actor.maxLevel());
+        const targetLevel = source.level - config.levelOffset;
         if (targetLevel < 1) {
             return null;
         }
-        if (offset > 0 || source.isMaxLevel() || targetLevel < source.level) {
-            // Start of the target level.
-            return actor.expForLevel(targetLevel);
+        if (targetLevel >= actor.maxLevel()) {
+            return actor.expForLevel(actor.maxLevel());
         }
-        // offset 0: same level and same progress toward the next level.
-        const srcStart = source.currentLevelExp();
-        const srcSpan = source.nextLevelExp() - srcStart;
-        const progress = srcSpan > 0 ? (source.currentExp() - srcStart) / srcSpan : 0;
         const start = actor.expForLevel(targetLevel);
         const span = actor.expForLevel(targetLevel + 1) - start;
-        return start + Math.floor(span * progress);
+        return start + Math.floor(span * levelProgress(source));
     };
 
     const syncActor = actor => {

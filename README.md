@@ -22,10 +22,14 @@ Whenever a companion joins the party, LevelSync checks their EXP against Sam's.
 Sam is always in the party, so Sam's EXP is the total the party has earned. If
 the companion is behind, they're raised to the target:
 
-- **Default:** they match Sam's exact level and EXP, as if they'd been with you
-  the whole time.
-- **Configurable:** set `levelOffset` to `N` and they catch up to the start of
-  level (Sam's level − N), for a smaller boost.
+- **Default (`levelOffset: 1`):** they catch up to one level below Sam, with
+  the same percentage progress toward the next level as Sam. Your active party
+  keeps a small edge for having been there.
+- **Configurable:** set `levelOffset` to `0` to match Sam's exact level and
+  EXP, or to any `N` to catch up to level (Sam's level − N) with Sam's
+  percentage progress. Because the target rises smoothly with Sam's EXP,
+  there's no benefit to removing and re-adding a companion right after Sam
+  levels up.
 
 A few things it keeps fair:
 
@@ -84,7 +88,7 @@ starting with `//` are comments.
 | Setting | Default | What it does |
 |---|---|---|
 | `enabled` | `true` | Turns the mod on or off |
-| `levelOffset` | `0` | `0` = match Sam exactly. `N` = start of level (Sam's level − N) |
+| `levelOffset` | `1` | `0` = match Sam exactly. `N` = level (Sam's level − N), with Sam's % progress to the next level |
 | `sourceActorId` | `1` | The character to catch up to (Sam) |
 | `excludedActorIds` | `[27, 29–37, 40, 41]` | Characters never caught up (minigame heroes and non-companions) |
 | `preserveHpMpRatio` | `true` | Keeps HP/MP percentage after leveling |
@@ -103,10 +107,23 @@ max level 20). These are the total EXP values needed to reach each level:
 | 4 | 326 | 9 | 3,610 | 14 | 12,816 | 19 | 29,944 |
 | 5 | 639 | 10 | 4,898 | 15 | 15,563 | 20 | 34,422 |
 
-**Example:** Sam is Lv 13 with 11,000 EXP.
+**How the target is calculated:**
 
-- `levelOffset: 0`: a companion joins at Lv 13 with 11,000 EXP.
-- `levelOffset: 2`: a companion joins at Lv 11 with 6,446 EXP.
+1. Sam's progress = (Sam's EXP − EXP for Sam's level) ÷ (EXP for Sam's next
+   level − EXP for Sam's level).
+2. Target level = Sam's level − `levelOffset`.
+3. Target EXP = EXP for target level + ⌊(EXP for target level + 1 − EXP for
+   target level) × Sam's progress⌋, rounded down.
+
+**Example:** Sam is Lv 11 with 7,359 EXP, exactly 50% of the way from
+6,446 to 8,272.
+
+- `levelOffset: 0`: a companion joins at Lv 11 with 7,359 EXP.
+- `levelOffset: 1`: Lv 10 with 4,898 + ⌊1,548 × 0.5⌋ = 5,672 EXP.
+- `levelOffset: 2`: Lv 9 with 3,610 + ⌊1,288 × 0.5⌋ = 4,254 EXP.
+
+If Sam is at max level (20), progress counts as 0. With offset 1, that means
+Lv 19 with 29,944 EXP.
 
 The mod doesn't hard-code this table. It calls the engine's own
 `Game_Actor.expForLevel` while the game runs, so the numbers stay correct if the
