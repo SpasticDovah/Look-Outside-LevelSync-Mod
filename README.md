@@ -62,22 +62,61 @@ staying in the party.
 
 ## Install
 
-Run from this folder in PowerShell:
+1. Find the game folder: in Steam, right-click **Look Outside** →
+   **Manage** → **Browse local files**. It's the folder containing `Game.exe`.
+2. Copy the `js` folder from inside this mod's `LevelSync` folder into the game
+   folder. It only adds new files; no game files are replaced.
 
-```powershell
-.\install.ps1                                  # default Steam location
-.\install.ps1 -GameDir "D:\Games\Look Outside" # other location
-.\install.ps1 -Uninstall                       # remove the mod
-```
+   ```
+   Look Outside\
+   └── js\
+       └── plugins\
+           ├── LevelSync.js              (new)
+           └── LevelSync.config.json     (new)
+   ```
 
-The installer:
+3. In the game folder, open `js\plugins.js` in a text editor such as Notepad.
+4. Copy the line below, **including the comma at the start**, and paste it
+   before the final `];` at the end of the file:
 
-- copies `LevelSync.js` and `LevelSync.config.json` into `<game>\js\plugins\`
-- adds the mod to the end of the game's plugin list in `js\plugins.js`
-- backs up the original list as `plugins.js.bak`
+   ```
+   ,{"name":"LevelSync","status":true,"description":"Catch up inactive party members to Sam's level on join","parameters":{}}
+   ```
 
-Running it again is safe and won't overwrite an edited config. A game update may
-replace `plugins.js`, so rerun the installer after updating.
+   The end of the file should then look like this:
+
+   ```
+           }
+       }
+   ,{"name":"LevelSync","status":true,"description":"Catch up inactive party members to Sam's level on join","parameters":{}}
+   ];
+   ```
+
+5. Save `plugins.js` and start the game.
+
+Other mods that are installed the same way each add their own line to
+`plugins.js`, so they can be installed together. Each line goes before the
+final `];`, and the order between them doesn't matter for LevelSync.
+
+### Disable or uninstall
+
+- **Disable:** in the line you pasted, change `"status":true` to
+  `"status":false`. Change it back to re-enable. (Setting `"enabled": false` in
+  `LevelSync.config.json` also works.)
+- **Uninstall:** delete the line you pasted, then delete
+  `js\plugins\LevelSync.js` and `js\plugins\LevelSync.config.json`. Steam's
+  **Properties** → **Installed Files** → **Verify integrity of game files**
+  also restores the original `plugins.js`.
+
+Delete the line before removing `LevelSync.js`. If `plugins.js` lists a plugin
+whose file is missing, the game shows an error at startup.
+
+### After a game update
+
+Game updates overwrite `plugins.js`, which removes the pasted line, so the mod
+stops loading. Repeat steps 3–5. If that doesn't work, reinstall the mod from
+step 2. Your `LevelSync.config.json` settings are kept unless you copy the
+mod's config over them.
 
 ## Configuration
 

@@ -30,7 +30,9 @@
  *
  * If the file is missing or invalid, built-in defaults are used.
  *
- * Place this plugin at the bottom of the plugin list.
+ * Register this plugin by adding this line before the final "];" in
+ * js/plugins.js:
+ *   ,{"name":"LevelSync","status":true,"description":"","parameters":{}}
  */
 
 (() => {
