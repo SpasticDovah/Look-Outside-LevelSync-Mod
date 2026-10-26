@@ -1,0 +1,18 @@
+// LevelSync configuration. Lines starting with // are ignored.
+// Changes take effect the next time the game is launched.
+//
+// levelOffset:
+//   0 = companions catch up to Sam's exact level and EXP (default)
+//   1 = companions catch up to the start of Sam's level - 1
+//   2 = companions catch up to the start of Sam's level - 2, etc.
+//
+// excludedActorIds: actors that are never synced. The defaults are the
+// in-game video game heroes (29-37) and non-companion actors (27, 40, 41).
+{
+    "enabled": true,
+    "levelOffset": 0,
+    "sourceActorId": 1,
+    "excludedActorIds": [27, 29, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41],
+    "preserveHpMpRatio": true,
+    "showLevelUpMessage": false
+}
