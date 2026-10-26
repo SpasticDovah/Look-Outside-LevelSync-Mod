@@ -10,8 +10,10 @@ In Look Outside, you can unlock many companions, but only three can travel with
 Sam at a time. Only the active party earns EXP. Companions waiting at the
 apartment stay at whatever level they had when you left them.
 
-On higher difficulties, that pushes you to pick an "A-team" early and never
-change it. Every point of EXP spent on a companion you might bench later is EXP
+On cursed difficulty, that pushes you to pick an "A-team" early and never
+change it. It is not mandatory to do so, but it certainly makes trying out a 
+dozen characters impractical and tedious.
+Every point of EXP spent on a companion you might bench later is EXP
 your main fighters didn't get. A companion you skipped early on stays at
 level 1–6 while the enemies keep getting harder. Most of the cast ends up
 unused, along with their skills and dialogue.
@@ -41,9 +43,6 @@ A few things it keeps fair:
 - **The video game minigame isn't affected.** Its heroes (actors 29–37) and a
   few non-companion actors are excluded, and the minigames' own EXP rewards are
   untouched.
-
-With this mod, picking your party comes down to who you want to bring, not who
-you already spent EXP on.
 
 ## Why it works on join (technical)
 
